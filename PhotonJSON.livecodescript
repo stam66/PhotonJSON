@@ -263,17 +263,9 @@ function validateJSON pJsonString
    so we replace them with "\u0022" and "\u005C" which we'll unescape
    with all the other unescapes when we parse */
 
-   if "\\" is in pJsonString then
-      replace "\\" with "\u005C" in pJsonString
-   end if
-
-   if (backSlash & quote) is in pJsonString then
-      replace (backSlash & quote) with "\u0022" in pJsonString
-   end if
-
-   if "\/" is in pJsonString then
-      replace "\/" with "/" in pJsonString
-   end if
+   put replaceText(pJsonString, "\\\\", "\u005C") into pJsonString
+   put replaceText(pJsonString, "\\" & quote, "\u0022") into pJsonString
+   put replaceText(pJsonString, "\\/", "/") into pJsonString
 
    put _cleaningNonPrintableChars(pJsonString) into pJsonString
 
@@ -366,9 +358,9 @@ function minifyJSON pJsonString
    # escaped quotes < " > and reverse-solidus < \\ > will confuse the tokenizer
    # so we replace them with "\u0022" and "\u005C" which we'll unescape
    # with all the other unescapes when we parse
-   if "\\" is in pJsonString then replace "\\" with "\u005C" in pJsonString
-   if (backSlash & quote) is in pJsonString then replace (backSlash & quote) with "\u0022" in pJsonString
-   if "\/" is in pJsonString then replace "\/" with "/" in pJsonString
+   put replaceText(pJsonString, "\\\\", "\u005C") into pJsonString
+   put replaceText(pJsonString, "\\" & quote, "\u0022") into pJsonString
+   put replaceText(pJsonString, "\\/", "/") into pJsonString
    put _cleaningNonPrintableChars(pJsonString) into pJsonString
 
    repeat for each token tToken in pJsonString
@@ -445,10 +437,11 @@ function JSONStringify pArray, pForceRootType, pPretty
    
    put tEndChar into the char - 1 of tJsonString
 
-   # Empty array and empty objects
-   if tJsonString is "[null]" then
+   # Empty list and empty object: JSONParser returns them as an array with
+   # one empty element, under the key 1 or "", so write those back as [] and {}
+   if tJsonString is "[" & quote & quote & "]" then
       put "[]" into tJsonString
-   else if tJsonString is "{" & quote & quote & ": null}" then
+   else if tJsonString is "{" & quote & quote & ": " & quote & quote & "}" then
       put "{}" into tJsonString
    end if
 
@@ -497,19 +490,22 @@ function JSONParser pJsonString
 
    if pJsonString is empty then return empty
    put _jsonTextFromInput(pJsonString) into pJsonString
-   replace tab with empty in pJsonString
-   replace cr with empty in pJsonString
+
+   # replaceText rather than replace throughout the pre-pass: on text outside
+   # ASCII, replace costs about 100 ms per call on a megabyte of text on this
+   # engine, replaceText a few milliseconds.
+   put replaceText(pJsonString, "[\t\n]", "") into pJsonString
 
    # escaped quotes < " > and reverse-solidus < \\ > will confuse the tokenizer
    # so we replace them with "\u0022" and "\u005C" which we'll unescape
    # with all the other unescapes when we parse
-   replace "\\" with "\u005C" in pJsonString
-   replace (backSlash & quote) with "\u0022" in pJsonString
-   replace numToChar(0) with "\u0000" in pJsonString
+   put replaceText(pJsonString, "\\\\", "\u005C") into pJsonString
+   put replaceText(pJsonString, "\\" & quote, "\u0022") into pJsonString
+   put replaceText(pJsonString, "\x{0}", "\u0000") into pJsonString
 
    # the token chunk drops the quotes, so hide a quoted "null" from the bare
    # null check below; the escape is undone with the others
-   replace quote & "null" & quote with quote & "\u006Eull" & quote in pJsonString
+   put replaceText(pJsonString, quote & "null" & quote, quote & "\u006Eull" & quote) into pJsonString
 
    if the number of tokens of pJsonString is 2 then
       if token 1 of pJsonString is "[" and the token 2 of pJsonString is "]" then
@@ -542,6 +538,7 @@ function JSONParser pJsonString
          case "}"
             # Fix bug when JSON has empty objects
             if tOldToken is "{" then
+               put empty into tObjEmpty
                put empty into tObjEmpty[empty]
                _builderArray tObjEmpty, tArrayKeysPath, tResultArray, tNumKeys
                put tToken into tOldToken
@@ -581,6 +578,7 @@ function JSONParser pJsonString
 
             # Fix bug when JSON has empty array
             if tOldToken is "[" then
+               put empty into tObjEmpty
                put empty into tObjEmpty[1]
                _builderArray tObjEmpty, tArrayKeysPath, tResultArray, tNumKeys
                put tToken into tOldToken
@@ -770,7 +768,9 @@ private command _builderArray @pValue, @pListKeys, @pArray, @pNumKeys
          put pValue into pArray[pListKeys[1]][pListKeys[2]][pListKeys[3]][pListKeys[4]][pListKeys[5]][pListKeys[6]][pListKeys[7]][pListKeys[8]][pListKeys[9]][pListKeys[10]]
          break
       default
-         repeat with x = 1 to pNumKeys
+         # wrap the value from the innermost key outwards, so that the path
+         # is pListKeys[1] / pListKeys[2] / ... / pListKeys[pNumKeys]
+         repeat with x = pNumKeys down to 1
             put empty into tArray
             put pValue into tArray[pListKeys[x]]
             put tArray into pValue
@@ -904,8 +904,8 @@ private function _jsonPrettyCompact pJsonString, pIndentSize, pForceRootType
    # escaped quotes < " > and reverse-solidus < \\ > will confuse the tokenizer
    # so we replace them with "\u0022" and "\u005C" which we'll unescape
    # with all the other unescapes when we parse
-   if "\\" is in pJsonString then replace "\\" with "\u005C" in pJsonString
-   if backSlash & quote is in pJsonString then replace backSlash & quote with "\u0022" in pJsonString
+   put replaceText(pJsonString, "\\\\", "\u005C") into pJsonString
+   put replaceText(pJsonString, "\\" & quote, "\u0022") into pJsonString
 
    // In this loop we only get where each JSON object and JSON array begins and ends.
    // For now to measure the size of these to know from where to where is each.
