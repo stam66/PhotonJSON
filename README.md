@@ -3,12 +3,12 @@
 # PhotonJSON: JSON library for LiveCode language
 [Leer en Español](LEEME.md)
 
-> ### About this branch
+> ### About this fork
 >
-> `integration/all-fixes` is upstream `main` plus the five fixes that have been submitted to
-> [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) as pull requests and not yet merged.
-> Use it when you need all of them together. It will be removed once upstream has merged them;
-> each fix also lives on its own `fix/*` branch here.
+> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus five
+> fixes that have been submitted upstream as pull requests and are not yet merged. `main` has all of
+> them together; each also lives on its own `fix/*` branch, which is what the pull request points at.
+> Once upstream has merged them this note goes away and the fork tracks upstream again.
 >
 > | PR | Fix |
 > |----|-----|
