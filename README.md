@@ -3,6 +3,24 @@
 # PhotonJSON: JSON library for LiveCode language
 [Leer en Español](LEEME.md)
 
+> ### About this branch
+>
+> `integration/all-fixes` is upstream `main` plus the five fixes that have been submitted to
+> [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) as pull requests and not yet merged.
+> Use it when you need all of them together. It will be removed once upstream has merged them;
+> each fix also lives on its own `fix/*` branch here.
+>
+> | PR | Fix |
+> |----|-----|
+> | [#9](https://github.com/DTByte-Ltd/PhotonJSON/pull/9) | `JSONStringify` escapes backslashes (`\` is written as `\\`); `minifyJSON` no longer re-escapes. |
+> | [#10](https://github.com/DTByte-Ltd/PhotonJSON/pull/10) | `JSONParser` decodes escapes in one pass by code point (no more `\\` becoming a space, no mis-read of the text an escape produces, surrogate pairs handled) and accepts UTF-8 as bytes, as text, or as text read with `url "file:"`. |
+> | [#11](https://github.com/DTByte-Ltd/PhotonJSON/pull/11) | An empty string is written as `""` and a bare `null` reads back as empty; a quoted `"null"` stays a string. |
+> | [#12](https://github.com/DTByte-Ltd/PhotonJSON/pull/12) | Text outside ASCII is written as UTF-8 instead of byte escapes by Mac Roman code; only control characters are escaped. |
+> | [#13](https://github.com/DTByte-Ltd/PhotonJSON/pull/13) | Only a canonical number is written bare (`"3.10"`, `"007"`, `"1e5"` stay strings); `1e-5` parses as one value. |
+>
+> Each fix has a test stack in `testing/`. Run one headless with `<engine> -ui testing/<file>.livecodescript`,
+> or load it in the IDE and call the command named in its header.
+
 [LiveCode](https://livecode.com/) script library for working with JSON, written in livecode-script and without the use of external.
 
 In this library ideas converge from many developers who created solutions like this in [LiveCode](https://livecode.com/) and in other programming languages. Although there are several libraries for working with JSON in [LiveCode](https://livecode.com/). We it a personal challenge to create our own version for which we took as a basis the great work done by Bob Hall in the [FastJSON](https://github.com/bhall2001/fastjson) library. We needed a library like [FastJSON](https://github.com/bhall2001/fastjson) and with the speed of Mount Goulding's [mergJSON](https://github.com/montegoulding/mergJSON). So we started writing PhotonJSON using FastJSON's ideas and code as a base, although in some cases we completely rewrote the algorithms.
