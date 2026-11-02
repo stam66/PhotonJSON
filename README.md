@@ -5,7 +5,7 @@
 
 > ### About this fork
 >
-> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus five
+> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus six
 > fixes that have been submitted upstream as pull requests and are not yet merged. `main` has all of
 > them together; each also lives on its own `fix/*` branch, which is what the pull request points at.
 > Once upstream has merged them this note goes away and the fork tracks upstream again.
@@ -17,6 +17,11 @@
 > | [#11](https://github.com/DTByte-Ltd/PhotonJSON/pull/11) | An empty string is written as `""` and a bare `null` reads back as empty; a quoted `"null"` stays a string. |
 > | [#12](https://github.com/DTByte-Ltd/PhotonJSON/pull/12) | Text outside ASCII is written as UTF-8 instead of byte escapes by Mac Roman code; only control characters are escaped. |
 > | [#13](https://github.com/DTByte-Ltd/PhotonJSON/pull/13) | Only a canonical number is written bare (`"3.10"`, `"007"`, `"1e5"` stay strings); `1e-5` parses as one value. |
+> | [#14](https://github.com/DTByte-Ltd/PhotonJSON/pull/14) | Values nested more than ten levels deep are stored on the right path; empty `[]` and `{}` no longer leak into each other. |
+>
+> The pre-pass and the non-printable scan now use regex functions, which on this engine are 30 to 100
+> times faster than `replace` on text outside ASCII: parsing a 1.3 MB document with Greek, accented and
+> emoji text takes 0.46 s instead of 1.7 s, and writing it 0.37 s, with valid UTF-8 output.
 >
 > Each fix has a test stack in `testing/`. Run one headless with `<engine> -ui testing/<file>.livecodescript`,
 > or load it in the IDE and call the command named in its header.
