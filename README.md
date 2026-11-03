@@ -5,8 +5,8 @@
 
 > ### About this fork
 >
-> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus nine
-> fixes: six submitted upstream as pull requests and not yet merged, and three more awaiting a pull request. `main` has all of
+> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus ten
+> fixes: six submitted upstream as pull requests and not yet merged, and four more awaiting a pull request. `main` has all of
 > them together; each also lives on its own `fix/*` branch, which is what the pull request points at.
 > Once upstream has merged them this note goes away and the fork tracks upstream again.
 >
@@ -21,6 +21,7 @@
 > | `fix/list-detection` | An array is written as a JSON list only when its keys are exactly 1 to n; sparse integer keys such as {2, 5} are written as an object instead of being dropped. |
 > | `fix/pretty-keys` | The pretty printer always writes keys as strings; `{"123": 1}` was written as `{123: 1}`. |
 > | `fix/sorted-keys` | Object keys are written in sorted order, so the same data always gives the same text. |
+> | `fix/pretty-speed` | The pretty printer measures containers in one pass instead of re-tokenising the document per container; a 3.8 MB document takes 3 s instead of 143 s. |
 >
 > The pre-pass and the non-printable scan now use regex functions, which on this engine are 30 to 100
 > times faster than `replace` on text outside ASCII: parsing a 1.3 MB document with Greek, accented and
