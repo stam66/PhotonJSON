@@ -5,7 +5,7 @@
 
 > ### About this fork
 >
-> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus ten
+> This fork is upstream [DTByte-Ltd/PhotonJSON](https://github.com/DTByte-Ltd/PhotonJSON) plus twelve
 > fixes, all submitted upstream as pull requests and not yet merged. `main` has all of
 > them together; each also lives on its own `fix/*` branch, which is what the pull request points at.
 > Once upstream has merged them this note goes away and the fork tracks upstream again.
@@ -22,6 +22,8 @@
 > | [#16](https://github.com/DTByte-Ltd/PhotonJSON/pull/16) | The pretty printer always writes keys as strings; `{"123": 1}` was written as `{123: 1}`. |
 > | [#17](https://github.com/DTByte-Ltd/PhotonJSON/pull/17) | Object keys are written in sorted order, so the same data always gives the same text. |
 > | [#18](https://github.com/DTByte-Ltd/PhotonJSON/pull/18) | The pretty printer measures containers in one pass instead of re-tokenising the document per container; a 3.8 MB document takes 3 s instead of 143 s. |
+> | [#19](https://github.com/DTByte-Ltd/PhotonJSON/pull/19) | The force-to-string option (`pForceRootType` "string") no longer quotes a string twice. |
+> | [#20](https://github.com/DTByte-Ltd/PhotonJSON/pull/20) | The library doc block sits after the extension handlers, where the extension tooling finds it, so the generated manifest and dictionary entry are complete. |
 >
 > The pre-pass and the non-printable scan now use regex functions, which on this engine are 30 to 100
 > times faster than `replace` on text outside ASCII: parsing a 1.3 MB document with Greek, accented and
